@@ -17,14 +17,16 @@ public:
     BoidScene(QWindow * parent = 0);
     ~BoidScene();
 signals:
-
 protected:
     void initializeGL(QGLPainter *painter);
     void paintGL(QGLPainter *painter);
+    void mouseDoubleClickEvent(QMouseEvent *e);
 private slots:
     void update_one_frame(QList<QVector3D> newPos);
     void fly_boids();
     void animate_boids();
+    void arrived_at_destination();
+    void change_destination();
 private:
     Boid * addBoid();
     //variables

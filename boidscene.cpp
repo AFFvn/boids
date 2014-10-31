@@ -25,6 +25,7 @@ BoidScene::BoidScene(QWindow * parent)
     m_boidScene->setParent(this);
     m_boidScene->setPalette(QSharedPointer<QGLMaterialCollection>(new QGLMaterialCollection(this)));
     m_boidScene->setEffect(QGL::LitMaterial);
+    m_boidScene->boundingBox().setToInfinite();
     setTitle(QString("Boids"));
     srand(QTime::currentTime().msec());
 
@@ -39,7 +40,7 @@ BoidScene::BoidScene(QWindow * parent)
     m_boidScene->addNode(node);
 
 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 100; i++)
     {
         Boid * boid = addBoid();
         boid->setPosition(QVector3D(rand()%6,rand()%6,rand()%6));
@@ -50,6 +51,7 @@ BoidScene::BoidScene(QWindow * parent)
     worker->moveToThread(thread);
     connect(thread, SIGNAL(started()), worker, SLOT(start_boids()));
     connect(worker, SIGNAL(finished_one_frame(QList<QVector3D>)), this, SLOT(update_one_frame(QList<QVector3D>)));
+    connect(worker, SIGNAL(destination_reached()), this, SLOT(change_destination()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
 
@@ -62,6 +64,8 @@ BoidScene::~BoidScene()
 Boid * BoidScene::addBoid()
 {
     Boid * boid = new Boid(m_boidScene);
+    int x = rand() % 5;
+    boid->setColour(x);
     myboids.append(boid);
     boid->setObjectName(QString("A Boid"));
     connect(boid, SIGNAL(updated()), this, SLOT(update()));
@@ -73,6 +77,12 @@ void BoidScene::paintGL(QGLPainter *painter)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_boidScene->draw(painter);
+}
+
+void BoidScene::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    QVector3D destination(rand()% 75 , rand() % 75, rand() % 75);
+    worker->setDestination(destination);
 }
 
 void BoidScene::initializeGL(QGLPainter *painter)
@@ -106,5 +116,15 @@ void BoidScene::update_one_frame(QList<QVector3D> newPos)
 
 void BoidScene::animate_boids()
 {
+}
+
+void BoidScene::arrived_at_destination()
+{
+}
+
+void BoidScene::change_destination()
+{
+    QVector3D destination(rand()% 75 , rand() % 75, rand() % 75);
+    worker->setDestination(destination);
 }
 

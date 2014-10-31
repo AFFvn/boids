@@ -16,12 +16,14 @@ public slots:
 public:
     void setVelocity(const QVector3D &velo);
     QVector3D getVelocity() const;
+    void setColour(int i);
 
 private:
     static QGLSceneNode *boidObject();
 
     QGLTexture2D *m_texture;
     QVector3D velocity;
+    int colourcode;
 };
 
 #endif // TANK_H
